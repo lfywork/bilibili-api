@@ -6,10 +6,8 @@ bilibili_api.video
 
 from copy import copy
 from enum import Enum
-from typing import Coroutine
-import aiohttp
+from typing import Coroutine, List
 import re
-import json
 import datetime
 import asyncio
 import aiohttp
@@ -505,7 +503,7 @@ class Video:
             data       (datetime.Date, optional): 指定日期后为获取历史弹幕，精确到年月日。Defaults to None.
 
         Returns:
-            list[Danmaku]: Danmaku 类的列表。
+            List[Danmaku]: Danmaku 类的列表。
         """
 
         if date is not None:
@@ -615,7 +613,7 @@ class Video:
             date       (datetime.date): 精确到年月。
 
         Returns:
-            None | list[str]: 调用 API 返回的结果。不存在时为 None。
+            None | List[str]: 调用 API 返回的结果。不存在时为 None。
         """
         self.credential.raise_for_no_sessdata()
 
@@ -628,13 +626,13 @@ class Video:
         }
         return await request("GET", url=api["url"], params=params, credential=self.credential)
 
-    async def has_liked_danmakus(self, page_index: int, ids: list[int]):
+    async def has_liked_danmakus(self, page_index: int, ids: List[int]):
         """
         是否已点赞弹幕。
 
         Args:
             page_index (int)      : 分 P 号，从 0 开始。
-            ids        (list[int]): 要查询的弹幕 ID 列表。
+            ids        (List[int]): 要查询的弹幕 ID 列表。
 
         Returns:
             dict: 调用 API 返回的结果。
@@ -839,13 +837,13 @@ class Video:
         }
         return await request("POST", url=api["url"], data=data, credential=self.credential)
 
-    async def set_favorite(self, add_media_ids: list[int] = [], del_media_ids: list[int] = []):
+    async def set_favorite(self, add_media_ids: List[int] = [], del_media_ids: List[int] = []):
         """
         设置视频收藏状况。
 
         Args:
-            add_media_ids (list[int], optional): 要添加到的收藏夹 ID. Defaults to [].
-            del_media_ids (list[int], optional): 要移出的收藏夹 ID. Defaults to [].
+            add_media_ids (List[int], optional): 要添加到的收藏夹 ID. Defaults to [].
+            del_media_ids (List[int], optional): 要移出的收藏夹 ID. Defaults to [].
 
         Returns:
             dict: 调用 API 返回结果。
@@ -1020,12 +1018,12 @@ class VideoOnlineMonitor(AsyncEvent):
                     self.dispatch("ERROR", msg)
                     break
 
-    async def __handle_data(self, data: list[dict]):
+    async def __handle_data(self, data: List[dict]):
         """
         处理数据。
 
         Args:
-            data (list[dict]): 收到的数据（已解析好）。
+            data (List[dict]): 收到的数据（已解析好）。
         """
         for d in data:
             if d['type'] == VideoOnlineMonitor.Datapack.SERVER_VERIFY.value:
@@ -1208,14 +1206,14 @@ class VideoUploader(AsyncEvent):
     def __init__(self,
                  cover: io.BufferedIOBase,
                  cover_type: str,
-                 pages: list[VideoUploaderPageObject],
+                 pages: List[VideoUploaderPageObject],
                  config: dict,
                  credential: Credential):
         """
         Args:
             cover      (io.BufferedIOBase)            : 封面 io 类，比如调用 open() 打开文件后的返回值。
             cover_type (str)                          : 封面数据 MIME 类型。常见类型对照 jpg: image/jpeg, png: image/png
-            pages      (list[VideoUploaderPageObject]): 分 P 视频列表。
+            pages      (List[VideoUploaderPageObject]): 分 P 视频列表。
             config     (dict)                         : 设置，格式参照 self.set_config()
             credential (Credential)                   : Credential 类。
         """
@@ -1311,13 +1309,13 @@ class VideoUploader(AsyncEvent):
         result = await self.__submit(cover_url, videos)
         return result
 
-    async def __submit(self, cover: str, videos: list):
+    async def __submit(self, cover: str, videos: List):
         """
         提交视频。
 
         Args:
             cover  (str) : 封面 URL。
-            videos (list): 要提交的视频，格式参照 self.start() 中的代码。
+            videos (List): 要提交的视频，格式参照 self.start() 中的代码。
 
         Returns:
             dict: 包含 bvid 和 aid 的字典。
@@ -1475,12 +1473,12 @@ class VideoUploader(AsyncEvent):
         self.dispatch("END", page)
         return filename
 
-    async def __task(self, chunks: list[Coroutine]):
+    async def __task(self, chunks: List[Coroutine]):
         """
         按顺序执行 chunk coroutine.
 
         Args:
-            chunks (list[Coroutine]): Coroutine
+            chunks (List[Coroutine]): Coroutine
         """
         for chunk in chunks:
             await chunk
